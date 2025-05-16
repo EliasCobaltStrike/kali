@@ -1,19 +1,11 @@
+version: "3"
+
 services:
-  kali-gui:
+  kali:
+    image: tigros/kali-desktop-xfce-vnc
     container_name: kali-gui
-    image: kalilinux/kali-rolling
-    privileged: true
     ports:
       - "6080:6080"
-    shm_size: "1gb"
-    command: >
-      bash -c "
-        apt-get update &&
-        DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies x11vnc xvfb novnc python3-websockify net-tools curl wget sudo dbus-x11 &&
-        mkdir -p ~/.vnc &&
-        x11vnc -storepasswd 1234 ~/.vnc/passwd &&
-        export DISPLAY=:1 &&
-        Xvfb :1 -screen 0 1024x768x16 &
-        sleep 2 &&
-        startxfce4 &
-        websockify --web=/usr/share/novnc/ 6080 localhost:5900"
+    environment:
+      - VNC_PASSWORD=kali
+    restart: unless-stopped
