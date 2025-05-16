@@ -1,9 +1,11 @@
+version: "3"
+
 services:
   kali-gui:
     image: kalilinux/kali-rolling
     container_name: kali-gui
     ports:
-      - "6080:6080"  # Zugriff im Browser über http://localhost:6080
+      - "6080:6080"
     environment:
       - USER=root
       - PASSWORD=toor
@@ -12,11 +14,14 @@ services:
     command: >
       bash -c "
         apt update &&
-        DEBIAN_FRONTEND=noninteractive apt install -y xfce4 xfce4-goodies tightvncserver novnc websockify &&
+        DEBIAN_FRONTEND=noninteractive apt install -y xfce4 xfce4-goodies tightvncserver novnc websockify dbus-x11 \
+        xfonts-base xfonts-100dpi xfonts-75dpi --no-install-recommends &&
         mkdir -p ~/.vnc &&
         echo toor | vncpasswd -f > ~/.vnc/passwd &&
         chmod 600 ~/.vnc/passwd &&
         export DISPLAY=:1 &&
+        export DBUS_SESSION_BUS_ADDRESS=/dev/null &&
+        vncserver -kill :1 || true &&
         vncserver :1 -geometry 1280x800 -depth 24 &&
         websockify --web=/usr/share/novnc/ 6080 localhost:5901
       "
