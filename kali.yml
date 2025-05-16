@@ -1,19 +1,19 @@
 services:
   kali-gui:
-    image: kalilinux/kali-rolling
     container_name: kali-gui
+    image: kalilinux/kali-rolling
+    privileged: true
     ports:
-      - "6080:6080" # noVNC-Port für Browser-Zugriff
-    tty: true
-    stdin_open: true
-    command: /bin/bash -c "
-      apt-get update && apt-get install -y \
-        xfce4 xfce4-goodies tightvncserver dbus-x11 \
-        x11-xserver-utils xfonts-base wget novnc websockify \
-        kali-linux-default \
-      && mkdir -p ~/.vnc \
-      && echo 'root' | vncpasswd -f > ~/.vnc/passwd \
-      && chmod 600 ~/.vnc/passwd \
-      && export USER=root \
-      && vncserver :1 -geometry 1280x800 -depth 24 \
-      && websockify --web=/usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5901"
+      - "6080:6080"
+    shm_size: "1gb"
+    command: >
+      bash -c "
+        apt-get update &&
+        DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies x11vnc xvfb novnc python3-websockify net-tools curl wget sudo dbus-x11 &&
+        mkdir -p ~/.vnc &&
+        x11vnc -storepasswd 1234 ~/.vnc/passwd &&
+        export DISPLAY=:1 &&
+        Xvfb :1 -screen 0 1024x768x16 &
+        sleep 2 &&
+        startxfce4 &
+        websockify --web=/usr/share/novnc/ 6080 localhost:5900"
