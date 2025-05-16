@@ -16,5 +16,4 @@ services:
       && chmod 600 ~/.vnc/passwd \
       && export USER=root \
       && vncserver :1 -geometry 1280x800 -depth 24 \
-      && websockify --web=/usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5901
-    "
+      && websockify --web=/usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5901"
