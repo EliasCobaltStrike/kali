@@ -1,11 +1,21 @@
-version: "3"
-
 services:
   kali:
-    image: tigros/kali-desktop-xfce-vnc
+    image: kalilinux/kali-rolling
     container_name: kali-gui
     ports:
       - "6080:6080"
     environment:
       - VNC_PASSWORD=kali
+      - USER=kali
+    command: >
+      /bin/bash -c "
+      echo 'keyboard-configuration keyboard-configuration/layoutcode select de' | debconf-set-selections && \
+      echo 'keyboard-configuration keyboard-configuration/xkb-keymap select de' | debconf-set-selections && \
+      apt-get update && \
+      DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies tightvncserver novnc websockify && \
+      vncserver :1 -geometry 1280x720 -depth 24 && \
+      websockify --web=/usr/share/novnc/ 6080 localhost:5901
+      "
+    stdin_open: true
+    tty: true
     restart: unless-stopped
